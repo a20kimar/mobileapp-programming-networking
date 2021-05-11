@@ -1,42 +1,48 @@
-
 # Rapport
 
-**Skriv din rapport här!**
+Jag skapade en listview i `activity_main.xml` och gav den ett ID.
 
-_Du kan ta bort all text som finns sedan tidigare_.
+Sedan skapade jag en arrayadapter samt en arraylist som syns i kodsnutten nedan.
 
-## Följande grundsyn gäller dugga-svar:
-
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
-
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
-
-```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
-    }
-}
+```java
+private ArrayAdapter<Mountain> mountainAdapter;
+private ArrayList<Mountain> mountainList = new ArrayList<>();
 ```
 
-Bilder läggs i samma mapp som markdown-filen.
+Sedan initialiserade jag min listview och skickade med min adapter till den. För att få min adapter att fungera var jag tvungen att skicka med en layout som adapten använder sig av för att senare visa mina objekt i, jag fastnade vid denna punkten men kom snabbt på banan igen efter jag skapade `list_items.xml` som endast innehåller en TextView och skickade med den med min adapter. Detta visas i koden nedan.
 
-![](android.png)
+```java
+mountainAdapter = new ArrayAdapter<>(this, R.layout.list_items,mountainList);
+ListView list = (ListView) findViewById(R.id.mylistview);
+list.setAdapter(mountainAdapter);
+```
 
-Läs gärna:
+Efter detta importerade jag nätverkskoden som vi skulle använda till uppgiften. Jag la till gson biblioteket för användning i projektet och sedan skapade jag koden för använda mig utav JSON data med hjälp utav gson. I samband med detta skapade jag även Mountain klassen och gjorde en egen konstruktor då jag tyckte det var lättare att hålla reda på vad mina objekt och array innehåller. Detta visas i koden nedan.
 
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
+```java
+        Gson gson = new Gson();
+        Mountain[] mountains;
+        mountains = gson.fromJson(json,Mountain[].class);
+        mountainAdapter.clear();
+        for (int i=0; i < mountains.length; i++)
+        {
+            mountainList.add(new Mountain(mountains[i].toString(), mountains[i].getLocation(), mountains[i].getHeight()));
+        }
+        mountainAdapter.notifyDataSetChanged();
+```
+
+Efter testning vid detta laget kunde jag få upp bergnamn i en lista vilket var ett eureka moment för mig. Då började jag med att skapa min toast. Detta var rätt så simpelt med en onItemClickListener och en onItemClick metod för att få det fungera. Min toast är simpel men får ut den information jag ville. Koden nedan visar hur jag gjorde detta.
+
+```java
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                String m = mountainList.get(position) + " is located in " + mountainList.get(position).getLocation() + " with the height of " + mountainList.get(position).getHeight();
+                Toast.makeText(MainActivity.this, m, Toast.LENGTH_SHORT).show();
+            }
+        });
+```
+
+Efter detta fungerade allt som det ska. Denna uppgiften var onekligen svårare än de förra och jag fick lägga mer tid än förväntat men till slut fick jag det att fungera. Nedan är en bild på hur appen ser ut inklusive toast meddelandet.
+
+![Toast](screenshot_1.png)
