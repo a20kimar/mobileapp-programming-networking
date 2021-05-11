@@ -4,7 +4,7 @@ public class Mountain {
 
     private String name;
     private String location;
-    private int height;
+    private int size;
 
     @Override
     public String toString() {
@@ -14,11 +14,11 @@ public class Mountain {
         return location;
     }
     public int getHeight() {
-        return height;
+        return size;
     }
     public Mountain(String n, String l, int h) {
         name = n;
         location = l;
-        height = h;
+        size = h;
     }
 }

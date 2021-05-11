@@ -6,8 +6,11 @@ import android.annotation.SuppressLint;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
@@ -41,6 +44,15 @@ public class MainActivity extends AppCompatActivity {
         list.setAdapter(mountainAdapter);
 
         new JsonTask().execute("https://wwwlab.iit.his.se/brom/kurser/mobilprog/dbservice/admin/getdataasjson.php?type=brom");
+
+
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id){
+                String m = mountainList.get(position) + " is located in " + mountainList.get(position).getLocation() + " with the height of " + mountainList.get(position).getHeight();
+                Toast.makeText(MainActivity.this, m, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -93,7 +105,7 @@ public class MainActivity extends AppCompatActivity {
                 mountainAdapter.clear();
                 for (int i=0; i < mountains.length; i++)
                 {
-                    mountainList.add(mountains[i]);
+                    mountainList.add(new Mountain(mountains[i].toString(), mountains[i].getLocation(), mountains[i].getHeight()));
                 }
                 mountainAdapter.notifyDataSetChanged();
 
