@@ -9,6 +9,13 @@ import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,16 +27,20 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ArrayAdapter<Mountain> mountainAdapter;
+    private ArrayList<Mountain> mountainList = new ArrayList<>();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ArrayList<Mountain> mountainList = new ArrayList<>();
-        ArrayAdapter<Mountain> mountainAdapter = new ArrayAdapter<>(this, R.layout.list_items,mountainList);
+        mountainAdapter = new ArrayAdapter<>(this, R.layout.list_items,mountainList);
 
         ListView list = (ListView) findViewById(R.id.mylistview);
         list.setAdapter(mountainAdapter);
+
+        new JsonTask().execute("https://wwwlab.iit.his.se/brom/kurser/mobilprog/dbservice/admin/getdataasjson.php?type=brom");
     }
 
     @SuppressLint("StaticFieldLeak")
@@ -74,7 +85,22 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(String json) {
-            Log.d("json =>", json);
+            Log.d("JSON: ", json);
+            try {
+                Gson gson = new Gson();
+                Mountain[] mountains;
+                mountains = gson.fromJson(json,Mountain[].class);
+                mountainAdapter.clear();
+                for (int i=0; i < mountains.length; i++)
+                {
+                    mountainList.add(mountains[i]);
+                }
+                mountainAdapter.notifyDataSetChanged();
+
+            } catch (JsonSyntaxException e) {
+                Log.e("JSON Exception: ",e.getMessage());
+            }
+
         }
     }
 }
